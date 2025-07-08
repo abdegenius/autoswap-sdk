@@ -1,4 +1,4 @@
-import { Contract } from "starknet";
+import { Contract, Uint256 } from "starknet";
 
 /**
  * Ekubo i129 amount structure with magnitude and sign
@@ -12,7 +12,10 @@ export interface I129 {
  * Ekubo swap parameters
  */
 export interface SwapParameters {
-  amount: I129; // Amount to swap with magnitude and sign
+  amount: {
+    mag: Uint256;
+    sign: boolean; // Always positive for swaps
+  }; // Amount to swap with magnitude and sign
   sqrt_ratio_limit: string; // Price limit for the swap (u128)
   is_token1: boolean; // Whether the input token is token1
   skip_ahead: number; // Skip ahead parameter (u32)
@@ -58,7 +61,7 @@ export interface SwapResult {
  */
 export enum FeeType {
   Fixed = 0,
-  Percentage = 1,
+  Percentage = 1
 }
 
 /**
@@ -138,5 +141,5 @@ export enum AutoSwapprError {
   INVALID_POOL_CONFIG = "INVALID_POOL_CONFIG",
   INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
   SWAP_FAILED = "SWAP_FAILED",
-  INVALID_INPUT = "INVALID_INPUT",
-} 
+  INVALID_INPUT = "INVALID_INPUT"
+}
