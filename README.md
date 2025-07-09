@@ -4,7 +4,7 @@ A TypeScript SDK for interacting with the AutoSwappr contract's `ekubo_manual_sw
 
 ## Features
 
-- 🔄 Execute Ekubo manual swaps
+- 🔄 Execute manual swaps
 - 💰 Token approval and balance management
 - ⛽ Gas estimation
 - 📊 Pool configuration management
@@ -68,7 +68,7 @@ new AutoSwappr(config: AutoSwapprConfig)
 
 ##### `executeEkuboManualSwap(tokenIn, tokenOut, options)`
 
-Execute a manual swap on Ekubo.
+Execute a manual swap
 
 ```typescript
 const result = await autoswappr.executeEkuboManualSwap(
