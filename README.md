@@ -1,14 +1,11 @@
 # AutoSwappr SDK
 
-A TypeScript SDK for interacting with the AutoSwappr contract's `ekubo_manual_swap` function on Starknet.
+A TypeScript SDK for interacting with the AutoSwappr contract's `manual_swap` function on Starknet.
 
 ## Features
 
-- 🔄 Execute manual swaps
-- 💰 Token approval and balance management
-- ⛽ Gas estimation
+- 🔄 Execute swaps
 - 📊 Pool configuration management
-- 🎯 Event listening for swap success
 - 🛡️ Comprehensive error handling
 - 📝 TypeScript support with full type definitions
 
@@ -31,11 +28,8 @@ const autoswappr = new AutoSwappr({
   privateKey: "YOUR_PRIVATE_KEY"
 });
 
-// Approve tokens
-await autoswappr.approveTokens(TOKEN_ADDRESSES.STRK, "1000000000000000000");
-
 // Execute swap
-const result = await autoswappr.executeEkuboManualSwap(
+const result = await autoswappr.executeSwap(
   TOKEN_ADDRESSES.STRK,
   TOKEN_ADDRESSES.USDC,
   {
@@ -66,12 +60,12 @@ new AutoSwappr(config: AutoSwapprConfig)
 
 #### Methods
 
-##### `executeEkuboManualSwap(tokenIn, tokenOut, options)`
+##### `executeSwap(tokenIn, tokenOut, options)`
 
-Execute a manual swap
+Execute a swap.
 
 ```typescript
-const result = await autoswappr.executeEkuboManualSwap(
+const result = await autoswappr.executeSwap(
   "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d", // STRK
   "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8", // USDC
   {
@@ -80,73 +74,6 @@ const result = await autoswappr.executeEkuboManualSwap(
     skipAhead: 0, // Skip ahead parameter
     sqrtRatioLimit: "18446748437148339061" // Custom price limit
   }
-);
-```
-
-##### `executeEkuboManualSwapWithMaxFee(tokenIn, tokenOut, options, maxFee?)`
-
-Execute a manual swap with custom max fee to avoid simulation_flags issues.
-
-```typescript
-const result = await autoswappr.executeEkuboManualSwapWithMaxFee(
-  TOKEN_ADDRESSES.STRK,
-  TOKEN_ADDRESSES.USDC,
-  {
-    amount: "1000000000000000000", // Amount in wei
-    isToken1: false
-  },
-  "0x200000000000000" // Custom max fee (0.2 ETH in wei)
-);
-```
-
-**Note**: This method is useful when encountering `simulation_flags` errors with certain RPC providers. It allows you to specify a custom max fee instead of relying on automatic fee estimation.
-
-##### `approveTokens(tokenAddress, amount)`
-
-Approve tokens for the AutoSwappr contract.
-
-```typescript
-await autoswappr.approveTokens(
-  TOKEN_ADDRESSES.STRK,
-  "1000000000000000000" // Amount in wei
-);
-```
-
-##### `getTokenBalance(tokenAddress)`
-
-Get token balance for the connected account.
-
-```typescript
-const balance = await autoswappr.getTokenBalance(TOKEN_ADDRESSES.STRK);
-```
-
-##### `getTokenAllowance(tokenAddress)`
-
-Get token allowance for the AutoSwappr contract.
-
-```typescript
-const allowance = await autoswappr.getTokenAllowance(TOKEN_ADDRESSES.STRK);
-```
-
-##### `estimateSwapGas(tokenIn, tokenOut, options)`
-
-Estimate gas for a swap operation.
-
-```typescript
-const gas = await autoswappr.estimateSwapGas(
-  TOKEN_ADDRESSES.STRK,
-  TOKEN_ADDRESSES.USDC,
-  { amount: "1000000000000000000" }
-);
-```
-
-##### `isTokenSupported(tokenAddress)`
-
-Check if a token is supported by the contract.
-
-```typescript
-const { supported, priceFeedId } = await autoswappr.isTokenSupported(
-  TOKEN_ADDRESSES.STRK
 );
 ```
 
@@ -168,18 +95,6 @@ const swapData = autoswappr.createSwapData(
   TOKEN_ADDRESSES.USDC,
   { amount: "1000000000000000000" }
 );
-```
-
-##### Event Listening
-
-```typescript
-// Listen for swap successful events
-autoswappr.onSwapSuccessful((event) => {
-  console.log("Swap successful:", event);
-});
-
-// Remove event listener
-autoswappr.offSwapSuccessful();
 ```
 
 ## Supported Token Pairs
@@ -210,7 +125,7 @@ The SDK provides comprehensive error handling with specific error types:
 import { AutoSwapprError } from "autoswappr-sdk";
 
 try {
-  await autoswappr.executeEkuboManualSwap(tokenIn, tokenOut, options);
+  await autoswappr.executeSwap(tokenIn, tokenOut, options);
 } catch (error) {
   if (error.message.includes(AutoSwapprError.INSUFFICIENT_ALLOWANCE)) {
     // Handle insufficient allowance
@@ -222,52 +137,6 @@ try {
 }
 ```
 
-## Troubleshooting
-
-### Simulation Flags Error
-
-If you encounter an error like `missing field: "simulation_flags"`, this is a known issue with certain RPC providers and newer versions of Starknet. Use the `executeEkuboManualSwapWithMaxFee` method instead:
-
-```typescript
-// Instead of this:
-await autoswappr.executeEkuboManualSwap(tokenIn, tokenOut, options);
-
-// Use this:
-await autoswappr.executeEkuboManualSwapWithMaxFee(
-  tokenIn,
-  tokenOut,
-  options,
-  "0x200000000000000" // Custom max fee
-);
-```
-
-### Gas Estimation Failures
-
-If gas estimation fails, the SDK will fall back to a reasonable default value. You can also set a custom max fee manually:
-
-```typescript
-// Set a higher max fee if needed
-const result = await autoswappr.executeEkuboManualSwapWithMaxFee(
-  TOKEN_ADDRESSES.STRK,
-  TOKEN_ADDRESSES.USDC,
-  { amount: "1000000000000000000" },
-  "0x500000000000000" // 0.5 ETH max fee
-);
-```
-
-### RPC Provider Issues
-
-If you're experiencing issues with a specific RPC provider, try switching to a different one:
-
-```typescript
-const config = {
-  // ... other config
-  rpcUrl: "https://alpha-mainnet.starknet.io", // Alternative RPC
-  // or
-  rpcUrl: "https://starknet-mainnet.infura.io/v3/YOUR_PROJECT_ID"
-};
-```
-
 ## Examples
 
 ### Basic Usage
@@ -276,53 +145,18 @@ const config = {
 import { AutoSwappr, TOKEN_ADDRESSES } from "autoswappr-sdk";
 
 const autoswappr = new AutoSwappr({
-  contractAddress: "0xYOUR_CONTRACT_ADDRESS",
+  contractAddress: "AUTOSWAPPR_CONTRACT_ADDRESS",
   rpcUrl: "https://starknet-mainnet.public.blastapi.io",
-  accountAddress: "0xYOUR_ACCOUNT_ADDRESS",
+  accountAddress: "YOUR_ACCOUNT_ADDRESS",
   privateKey: "0xYOUR_PRIVATE_KEY"
 });
 
-// Check balance and allowance
-const balance = await autoswappr.getTokenBalance(TOKEN_ADDRESSES.STRK);
-const allowance = await autoswappr.getTokenAllowance(TOKEN_ADDRESSES.STRK);
-
-// Approve if needed
-if (
-  uint256.uint256ToBN(allowance) <
-  uint256.uint256ToBN(uint256.bnToUint256("1000000000000000000"))
-) {
-  await autoswappr.approveTokens(TOKEN_ADDRESSES.STRK, "1000000000000000000");
-}
-
 // Execute swap
-const result = await autoswappr.executeEkuboManualSwap(
+const result = await autoswappr.executeSwap(
   TOKEN_ADDRESSES.STRK,
   TOKEN_ADDRESSES.USDC,
   { amount: "1000000000000000000" }
 );
-```
-
-### Advanced Usage
-
-```typescript
-// Gas estimation
-const gas = await autoswappr.estimateSwapGas(
-  TOKEN_ADDRESSES.STRK,
-  TOKEN_ADDRESSES.USDC,
-  { amount: "1000000000000000000" }
-);
-
-// Event listening
-autoswappr.onSwapSuccessful((event) => {
-  console.log("Swap successful:", event);
-});
-
-// Batch operations
-const tokens = [TOKEN_ADDRESSES.STRK, TOKEN_ADDRESSES.ETH];
-const supportPromises = tokens.map((token) =>
-  autoswappr.isTokenSupported(token)
-);
-const supportResults = await Promise.all(supportPromises);
 ```
 
 ## Development
@@ -330,28 +164,15 @@ const supportResults = await Promise.all(supportPromises);
 ### Building
 
 ```bash
-npm run build
-```
-
-### Testing
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
+yarn build
 ```
 
 ## Security Considerations
 
 1. **Private Key Management**: Never expose private keys in client-side code
-2. **Token Approvals**: Only approve the amount you intend to swap
-3. **Slippage Protection**: Consider implementing slippage checks
-4. **Pool Validation**: Verify pool addresses and parameters before swapping
-5. **Error Handling**: Implement proper error handling for failed transactions
+2. **Slippage Protection**: Consider implementing slippage checks
+3. **Pool Validation**: Verify pool addresses and parameters before swapping
+4. **Error Handling**: Implement proper error handling for failed transactions
 
 ## License
 

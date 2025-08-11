@@ -1,12 +1,4 @@
-import { Contract, Uint256 } from "starknet";
-
-/**
- * Ekubo i129 amount structure with magnitude and sign
- */
-export interface I129 {
-  mag: string; // Magnitude as string (u128)
-  sign: boolean; // Sign (false = positive, true = negative)
-}
+import { Uint256 } from "starknet";
 
 /**
  * Ekubo swap parameters
@@ -33,27 +25,12 @@ export interface PoolKey {
 }
 
 /**
- * Ekubo delta structure for swap results
- */
-export interface Delta {
-  amount0: I129; // Amount of token0
-  amount1: I129; // Amount of token1
-}
-
-/**
  * Swap data structure for ekubo_manual_swap function
  */
 export interface SwapData {
   params: SwapParameters;
   pool_key: PoolKey;
   caller: string;
-}
-
-/**
- * Swap result structure returned by ekubo_manual_swap function
- */
-export interface SwapResult {
-  delta: Delta;
 }
 
 /**
@@ -75,18 +52,6 @@ export interface ContractInfo {
   owner: string;
   fee_type: FeeType;
   percentage_fee: number;
-}
-
-/**
- * Swap successful event structure
- */
-export interface SwapSuccessfulEvent {
-  token_from_address: string;
-  token_from_amount: { low: string; high: string };
-  token_to_address: string;
-  token_to_amount: { low: string; high: string };
-  beneficiary: string;
-  provider: string;
 }
 
 /**

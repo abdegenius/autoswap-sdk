@@ -6,15 +6,11 @@ export type {
   AutoSwapprConfig,
   SwapData,
   SwapOptions,
-  SwapResult,
   ContractInfo,
   TokenInfo,
   PoolConfig,
-  I129,
   SwapParameters,
-  PoolKey,
-  Delta,
-  SwapSuccessfulEvent
+  PoolKey
 } from "./types";
 
 // Enum exports
@@ -45,4 +41,4 @@ export {
   calculateSlippageTolerance,
   sleep,
   retry
-} from "./utils"; 
+} from "./utils";

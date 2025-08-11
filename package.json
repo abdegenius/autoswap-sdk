@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "basic-usage": "npx ts-node examples/basic-usage.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"
@@ -19,9 +20,10 @@
     "ekubo",
     "autoswappr"
   ],
-  "author": "Your Name",
+  "author": "Ejembi Emmanuel",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^17.2.1",
     "starknet": "^5.19.5"
   },
   "devDependencies": {
@@ -41,7 +43,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/autoswappr-sdk.git"
+    "url": "https://github.com/BlockheaderWeb3-Community/autoswap-sdk.git"
   },
   "jest": {
     "preset": "ts-jest",
