@@ -1,4 +1,4 @@
-import { Uint256 } from "starknet";
+import { Uint256 } from 'starknet';
 
 /**
  * Ekubo swap parameters
@@ -38,7 +38,7 @@ export interface SwapData {
  */
 export enum FeeType {
   Fixed = 0,
-  Percentage = 1
+  Percentage = 1,
 }
 
 /**
@@ -100,11 +100,11 @@ export interface SwapOptions {
  * Error types for the SDK
  */
 export enum AutoSwapprError {
-  INSUFFICIENT_ALLOWANCE = "INSUFFICIENT_ALLOWANCE",
-  UNSUPPORTED_TOKEN = "UNSUPPORTED_TOKEN",
-  ZERO_AMOUNT = "ZERO_AMOUNT",
-  INVALID_POOL_CONFIG = "INVALID_POOL_CONFIG",
-  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
-  SWAP_FAILED = "SWAP_FAILED",
-  INVALID_INPUT = "INVALID_INPUT"
+  INSUFFICIENT_ALLOWANCE = 'INSUFFICIENT_ALLOWANCE',
+  UNSUPPORTED_TOKEN = 'UNSUPPORTED_TOKEN',
+  ZERO_AMOUNT = 'ZERO_AMOUNT',
+  INVALID_POOL_CONFIG = 'INVALID_POOL_CONFIG',
+  INSUFFICIENT_BALANCE = 'INSUFFICIENT_BALANCE',
+  SWAP_FAILED = 'SWAP_FAILED',
+  INVALID_INPUT = 'INVALID_INPUT',
 }

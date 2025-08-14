@@ -1,13 +1,12 @@
 {
   "name": "autoswap-sdk",
-  "version": "1.0.0",
-  "description": "TypeScript SDK for interacting with AutoSwappr contract's ekubo_manual_swap function",
+  "version": "1.0.1",
+  "description": "TypeScript SDK for interacting with AutoSwappr function",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "basic-usage": "npx ts-node examples/basic-usage.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"
