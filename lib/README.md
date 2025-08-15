@@ -13,6 +13,12 @@ A TypeScript SDK for interacting with the AutoSwappr contract.
 npm install autoswap-sdk
 ```
 
+## AutoSwappr Contract Address
+
+```
+0x5b08cbdaa6a2338e69fad7c62ce20204f1666fece27288837163c19320b9496
+```
+
 ## Quick Start
 
 ```typescript
