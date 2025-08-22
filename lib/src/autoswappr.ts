@@ -1,14 +1,13 @@
-import { Account, cairo, CallData, Contract, RpcProvider } from "starknet";
+import { Account, cairo, CallData, Contract, RpcProvider } from 'starknet';
 import {
   AutoSwapprConfig,
   SwapData,
   SwapOptions,
-  ContractInfo,
-  PoolConfig,
-  AutoSwapprError
-} from "./types";
-import { AUTOSWAPPR_ABI } from "./contracts/autoswappr-abi";
-import { getPoolConfig } from "./constants/pools";
+  AutoSwapprError,
+} from './types';
+import { AUTOSWAPPR_ABI } from './contracts/autoswappr-abi';
+import { getTopPoolAsConfig } from './utils/ekubo';
+import { TOKEN_INFO } from './constants/pools';
 
 /**
  * AutoSwappr SDK for interacting with the AutoSwappr Contract
@@ -36,50 +35,19 @@ export class AutoSwappr {
   }
 
   /**
-   * Get contract information
-   * @returns Contract information including addresses and fee configuration
-   */
-  async getContractInfo(): Promise<ContractInfo> {
-    try {
-      const result = await this.autoswapprContract.contract_parameters();
-      return {
-        fees_collector: result.fees_collector,
-        fibrous_exchange_address: result.fibrous_exchange_address,
-        avnu_exchange_address: result.avnu_exchange_address,
-        oracle_address: result.oracle_address,
-        owner: result.owner,
-        fee_type: result.fee_type,
-        percentage_fee: result.percentage_fee
-      };
-    } catch (error) {
-      throw new Error(`Failed to get contract info: ${error}`);
-    }
-  }
-
-  /**
-   * Get pool configuration for a token pair
-   * @param token0 First token address
-   * @param token1 Second token address
-   * @returns Pool configuration or null if not found
-   */
-  getPoolConfig(token0: string, token1: string): PoolConfig | null {
-    return getPoolConfig(token0, token1);
-  }
-
-  /**
    * Create swap data for ekubo_manual_swap
    * @param tokenIn Input token address
    * @param tokenOut Output token address
    * @param options Swap options
    * @returns SwapData object
    */
-  createSwapData(
+  async createSwapData(
     tokenIn: string,
     tokenOut: string,
     options: SwapOptions
-  ): SwapData {
+  ): Promise<SwapData> {
     // Get pool configuration
-    const poolConfig = this.getPoolConfig(tokenIn, tokenOut);
+    const poolConfig = await getTopPoolAsConfig(tokenIn, tokenOut);
     if (!poolConfig) {
       throw new Error(AutoSwapprError.INVALID_POOL_CONFIG);
     }
@@ -87,15 +55,18 @@ export class AutoSwappr {
     // Determine if input token is token1
     const isToken1 = options.isToken1 ?? tokenIn === poolConfig.token1;
 
+    const amountInDecimals =
+      Number(options.amount) * 10 ** TOKEN_INFO[tokenIn].decimals;
+
     // Create swap parameters
     const swapParams = {
       amount: {
-        mag: cairo.uint256(options.amount),
-        sign: false
+        mag: cairo.uint256(amountInDecimals.toString()),
+        sign: false,
       },
       sqrt_ratio_limit: options.sqrtRatioLimit || poolConfig.sqrt_ratio_limit,
       is_token1: isToken1,
-      skip_ahead: options.skipAhead || 0
+      skip_ahead: options.skipAhead || 0,
     };
 
     // Create pool key
@@ -104,13 +75,13 @@ export class AutoSwappr {
       token1: poolConfig.token1,
       fee: poolConfig.fee,
       tick_spacing: poolConfig.tick_spacing,
-      extension: poolConfig.extension
+      extension: poolConfig.extension,
     };
 
     return {
       params: swapParams,
       pool_key: poolKey,
-      caller: this.account.address
+      caller: this.account.address,
     };
   }
 
@@ -124,41 +95,44 @@ export class AutoSwappr {
   async executeSwap(tokenIn: string, tokenOut: string, options: SwapOptions) {
     try {
       // Validate inputs
-      if (!options.amount || options.amount === "0") {
+      if (!options.amount || options.amount === '0') {
         throw new Error(AutoSwapprError.ZERO_AMOUNT);
       }
 
       // Create swap data
-      const swapData = this.createSwapData(tokenIn, tokenOut, options);
+      const swapData = await this.createSwapData(tokenIn, tokenOut, options);
+
+      const amountInDecimals =
+        Number(options.amount) * 10 ** TOKEN_INFO[tokenIn].decimals;
 
       const approveCall = {
         contractAddress: tokenIn,
-        entrypoint: "approve",
+        entrypoint: 'approve',
         calldata: CallData.compile({
           spender: this.config.contractAddress,
-          amount: cairo.uint256(options.amount)
-        })
+          amount: cairo.uint256(amountInDecimals.toString()),
+        }),
       };
 
       const swapCall = {
         contractAddress: this.config.contractAddress,
-        entrypoint: "ekubo_manual_swap",
+        entrypoint: 'ekubo_manual_swap',
         calldata: CallData.compile({
-          swapData
-        })
+          swapData,
+        }),
       };
 
       const result = await this.account.execute(
         [approveCall, swapCall],
         undefined,
         {
-          maxFee: "100000000000000"
+          maxFee: '100000000000000',
         }
       );
 
       return { result };
     } catch (error) {
-      console.error("Swap failed:", error);
+      console.error('Swap failed:', error);
       throw error;
     }
   }

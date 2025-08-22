@@ -1,59 +1,3 @@
-import { PoolConfig } from '../types';
-
-/**
- * Predefined pool configurations for common token pairs
- * These are based on the actual Ekubo pool configurations
- */
-
-export const POOL_CONFIGS: Record<string, PoolConfig> = {
-  // STRK/USDC pool
-  STRK_USDC: {
-    token0:
-      '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // STRK
-    token1:
-      '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8', // USDC
-    fee: '170141183460469235273462165868118016',
-    tick_spacing: 1000,
-    extension: '0',
-    sqrt_ratio_limit: '18446748437148339061',
-  },
-
-  // STRK/USDT pool (different configuration)
-  STRK_USDT: {
-    token0:
-      '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // STRK
-    token1: '0x068f5c6a61730768477ced7eef7680a434a851905eeff58ee8ba2115ada38e3', // USDT
-    fee: '34028236692093847977029636859101184',
-    tick_spacing: 354892,
-    extension:
-      '1919341413504682506464537888213340599793174343085035697059721110464975114204',
-    sqrt_ratio_limit: '18446748437148339061',
-  },
-
-  // ETH/USDC pool
-  ETH_USDC: {
-    token0:
-      '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH
-    token1:
-      '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8', // USDC
-    fee: '170141183460469235273462165868118016',
-    tick_spacing: 1000,
-    extension: '0',
-    sqrt_ratio_limit: '18446748437148339061',
-  },
-
-  // ETH/USDT pool
-  ETH_USDT: {
-    token0:
-      '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH
-    token1: '0x068f5c6a61730768477ced7eef7680a434a851905eeff58ee8ba2115ada38e3', // USDT
-    fee: '170141183460469235273462165868118016',
-    tick_spacing: 1000,
-    extension: '0',
-    sqrt_ratio_limit: '18446748437148339061',
-  },
-};
-
 /**
  * Token addresses for common tokens
  */
@@ -61,7 +5,8 @@ export const TOKEN_ADDRESSES = {
   STRK: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
   ETH: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
   USDC: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
-  USDT: '0x068f5c6a61730768477ced7eef7680a434a851905eeff58ee8ba2115ada38e3',
+  USDT: '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
+  WBTC: '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac',
 };
 
 /**
@@ -92,56 +37,13 @@ export const TOKEN_INFO = {
     decimals: 6,
     name: 'Tether USD',
   },
+  [TOKEN_ADDRESSES.WBTC]: {
+    address: TOKEN_ADDRESSES.WBTC,
+    symbol: 'WBTC',
+    decimals: 8,
+    name: 'Wrapped BTC',
+  },
 };
-
-/**
- * Get token symbol from address
- * @param address Token address
- * @returns Token symbol or null if not found
- */
-function getTokenSymbol(address: string): string | null {
-  for (const [symbol, tokenAddress] of Object.entries(TOKEN_ADDRESSES)) {
-    if (tokenAddress === address) {
-      return symbol;
-    }
-  }
-  return null;
-}
-
-/**
- * Get pool configuration for a token pair
- * @param token0 First token address
- * @param token1 Second token address
- * @returns Pool configuration or null if not found
- */
-export function getPoolConfig(
-  token0: string,
-  token1: string
-): PoolConfig | null {
-  // Get token symbols
-  const symbol0 = getTokenSymbol(token0);
-  const symbol1 = getTokenSymbol(token1);
-
-  if (!symbol0 || !symbol1) {
-    return null;
-  }
-
-  // Check direct match
-  const directKey = `${symbol0}_${symbol1}`;
-  if (POOL_CONFIGS[directKey]) {
-    return POOL_CONFIGS[directKey];
-  }
-
-  // Check reverse match
-  const reverseKey = `${symbol1}_${symbol0}`;
-  if (POOL_CONFIGS[reverseKey]) {
-    // Return the original config without swapping token0/token1
-    // This ensures consistent ordering regardless of input order
-    return POOL_CONFIGS[reverseKey];
-  }
-
-  return null;
-}
 
 /**
  * Get token info by address

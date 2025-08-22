@@ -16,7 +16,7 @@ npm install autoswap-sdk
 ## AutoSwappr Contract Address
 
 ```
-0x5b08cbdaa6a2338e69fad7c62ce20204f1666fece27288837163c19320b9496
+0x05582ad635c43b4c14dbfa53cbde0df32266164a0d1b36e5b510e5b34aeb364b
 ```
 
 ## Quick Start
@@ -37,8 +37,7 @@ const result = await autoswappr.executeSwap(
   TOKEN_ADDRESSES.STRK,
   TOKEN_ADDRESSES.USDC,
   {
-    amount: '1000000000000000000', // 1 STRK
-    isToken1: false,
+    amount: '1', // 1 STRK
   }
 );
 

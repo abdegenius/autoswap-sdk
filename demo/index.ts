@@ -44,14 +44,12 @@ async function basicUsageExample() {
     console.log("AutoSwappr SDK initialized");
 
     const swapOptions = {
-      amount: "1000000000000000000", // 1 STRK (18 decimals)
-      isToken1: false, // STRK is token0 in STRK/USDC pool
-      skipAhead: 0
+      amount: "0.00001" //
     };
 
-    console.log("Executing swap: STRK -> USDC");
+    console.log("Executing swap: ETH -> USDC");
     const swapResult = await autoswappr.executeSwap(
-      TOKEN_ADDRESSES.STRK,
+      TOKEN_ADDRESSES.ETH,
       TOKEN_ADDRESSES.USDC,
       swapOptions
     );
