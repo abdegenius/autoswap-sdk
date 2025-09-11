@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
-import ethers from "ethers";
-import { AutoSwappr, AutoSwapprBase, TOKEN_ADDRESSES } from "autoswap-sdk";
+import { AutoSwappr, TOKEN_ADDRESSES } from "autoswap-sdk";
+
 dotenv.config();
 
 /**
@@ -36,7 +36,7 @@ async function basicUsageExample() {
     contractAddress: autoswapprContractAddress,
     rpcUrl,
     accountAddress,
-    privateKey,
+    privateKey
   };
 
   try {
@@ -44,7 +44,7 @@ async function basicUsageExample() {
     console.log("AutoSwappr SDK initialized");
 
     const swapOptions = {
-      amount: "0.00001", //
+      amount: "0.00001" //
     };
 
     console.log("Executing swap: ETH -> USDC");
@@ -60,43 +60,5 @@ async function basicUsageExample() {
   }
 }
 
-async function convertUSDC2CNGN() {
-  const rpcUrl = process.env.BASE_RPC_URL;
-  if (!rpcUrl) {
-    console.error("Missing RPC url");
-    return;
-  }
-
-  const privateKey = process.env.BASE_PRIVATE_KEY;
-  if (!privateKey) {
-    console.error("Missing private key");
-    return;
-  }
-
-  try {
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const signer = new ethers.Wallet(privateKey, provider);
-    const autoswapprBase = new AutoSwapprBase(provider, signer);
-    console.log("AutoSwappr Base SDK initialized");
-
-    // Estimate
-    const usdcAmount = ethers.parseUnits("10", 6); // 10 USDC
-    const estimated = await autoswapprBase.estimateCNGNOutput(usdcAmount);
-    console.log(`Expected: ${ethers.formatUnits(estimated, 6)} cNGN`);
-
-    // Swap if estimate looks good
-    if (estimated > 0n) {
-      console.log("Executing swap: USDC -> CNGN");
-      const tx = await autoswapprBase.swapUSDCForCNGN(usdcAmount, 50); // 0.5% slippage
-      await tx.wait();
-      console.log("Swap result:", tx);
-    }
-    console.log("Estimated NGN value less than 0");
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
 // Run the example
 basicUsageExample();
-convertUSDC2CNGN();
